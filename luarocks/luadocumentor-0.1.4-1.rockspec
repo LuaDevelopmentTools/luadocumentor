@@ -3,10 +3,10 @@ version = '0.1.4-1'
 description = {
   summary = 'LuaDocumentor allow users to generate HTML and API files from code documented using Lua documentation language.',
   detailed = [[
-      This is an example for the LuaRocks tutorial.
-      Here we would put a detailed, typically
-      paragraph-long description.
-   ]],
+    This is an example for the LuaRocks tutorial.
+    Here we would put a detailed, typically
+    paragraph-long description.
+  ]],
   homepage = 'http://wiki.eclipse.org/Koneki/LDT/User_Area/LuaDocumentor',
   license = 'EPL'
 }
@@ -18,7 +18,7 @@ dependencies = {
   'lua ~> 5.1',
   'luafilesystem ~> 1.6',
   'markdown ~> 0.32',
-  'metalua-parser ~> 0.7.2',
+  'metalua-compiler ~> 0.7.2',
   'penlight ~> 0.9.8'
 }
 build = {
@@ -35,7 +35,7 @@ build = {
     defaultcss = 'defaultcss.lua',
     docgenerator = 'docgenerator.lua',
     extractors = 'extractors.lua',
-    lddextractors = 'lddextractor.lua',
+    lddextractor = 'lddextractor.lua',
     templateengine = 'templateengine.lua',
 
     ['fs.lfs'] = 'fs/lfs.lua',
