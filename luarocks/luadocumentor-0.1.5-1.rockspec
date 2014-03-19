@@ -18,8 +18,8 @@ dependencies = {
   'lua ~> 5.1',
   'luafilesystem ~> 1.6',
   'markdown ~> 0.32',
-  'metalua-compiler == 0.7.3',
-  'penlight ~> 0.9.8'
+  'metalua-compiler ~> 0.7',
+  'penlight ~> 0.9'
 }
 build = {
   type = 'builtin',
