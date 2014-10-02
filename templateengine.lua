@@ -20,9 +20,9 @@ local pltemplate = require 'pl.template'
 local markdown = require 'markdown'
 
 -- apply template to the given element
-function M.applytemplate(elem, ident, templatetype)
+function M.applytemplate(elem, ident, templatetype,...)
   -- define environment
-  local env = M.getenv(elem, ident)
+  local env = M.getenv(elem, ident,...)
 
   -- load template
   local template = M.gettemplate(elem,templatetype)
@@ -44,13 +44,14 @@ function M.applytemplate(elem, ident, templatetype)
 end
 
 -- get the a new environment for this element
-function M.getenv(elem, ident)
+function M.getenv(elem, ident,...)
   local currentenv ={}
   for k,v in pairs(M.env) do currentenv[k] = v end
   if elem and elem.tag then
     currentenv['_'..elem.tag]= elem
   end
   currentenv['i']= ident or 1
+  currentenv['templateparams']= {...}
   return currentenv
 end
 
@@ -86,9 +87,9 @@ end
 ---
 -- Provide a full link to an element using `prettyname` and `linkto`.
 -- Default implementation is for HTML.
-local function fulllinkto(o)
-  local ref   = M.env.linkto(o)
-  local name	= M.env.prettyname(o)
+local function fulllinkto(o,...)
+  local ref   = M.env.linkto(o,...)
+  local name  = M.env.prettyname(o,...)
   if not ref then
     return name
   end
@@ -107,7 +108,7 @@ local defaultenv = {
   linkto        = function(str) return str end,
   fulllinkto    = fulllinkto,
   prettyname    = function(s) return s end,
-  getelement    = function(s)	return nil end
+  getelement    = function(s) return nil end
 }
 
 -- this is the global env accessible in the templates

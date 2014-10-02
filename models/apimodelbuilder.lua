@@ -25,9 +25,12 @@ local primitivetypes = {
   ['nil']      = true,
   ['number']   = true,
   ['string']   = true,
-  ['table']    = true,
   ['thread']   = true,
-  ['userdata'] = true
+  ['userdata'] = true,
+  ['list']     = true,
+  ['map']      = true,
+  ['any']      = true
+
 }
 
 -- get or create the typedef with the name "name"
@@ -68,8 +71,21 @@ local function createtyperef(dt_typeref,_file,sourcerangemin,sourcerangemax)
       _typeref.modulename = dt_typeref.module
       _typeref.typename = dt_typeref.type
     else
-      if primitivetypes[dt_typeref.type] then
-        -- manage primitive type
+      if dt_typeref.type == "table" then
+        -- manage special table type
+        _typeref = apimodel._inlinetyperef(apimodel._recordtypedef("table"))
+      elseif dt_typeref.type == "list" or dt_typeref.type == "map" then
+        -- manage structures
+        local structuretypedef = apimodel._recordtypedef(dt_typeref)
+        structuretypedef.defaultvaluetyperef = createtyperef(dt_typeref.valuetype)
+        if dt_typeref.type == "map" then
+          structuretypedef.defaultkeytyperef = createtyperef(dt_typeref.keytype)
+        end
+        structuretypedef.structurekind = dt_typeref.type
+        structuretypedef.name = dt_typeref.type
+        _typeref = apimodel._inlinetyperef(structuretypedef)
+      elseif primitivetypes[dt_typeref.type] then
+        -- manage primitive types
         _typeref = apimodel._primitivetyperef()
         _typeref.typename = dt_typeref.type
       else
@@ -209,6 +225,28 @@ local function generatefunctiontypename(_functiontypedef)
   return table.concat(name)
 end
 
+--
+-- Store user defined tags
+--
+local function attachmetadata(apiobj, parsedcomment)
+  local thirdtags = parsedcomment and parsedcomment.unknowntags
+  if thirdtags  then
+    -- Define a storage index for user defined tags on current API element
+    if not apiobj.metadata then apiobj.metadata = {} end
+
+    -- Loop over user defined tags
+    for usertag, taglist in pairs(thirdtags) do
+      if not apiobj.metadata[ usertag ] then
+        apiobj.metadata[ usertag ] = {
+          tag = usertag
+        }
+      end
+      for _, tag in ipairs( taglist ) do
+        table.insert(apiobj.metadata[usertag], tag)
+      end
+    end
+  end
+end
 
 
 ------------------------------------------------------
@@ -270,7 +308,32 @@ function M.createmoduleapi(ast,modulename)
           table.insert(_file.returns,_return)
 
           --create recordtypedef is not define
-          gettypedef(_file,_typeref.typename,"recordtypedef",sourcerangemin,sourcerangemax)
+          local _moduletypedef = gettypedef(_file,_typeref.typename,"recordtypedef",sourcerangemin,sourcerangemax)
+
+          -- manage extends (inheritance) and structure tags
+          if _moduletypedef and _moduletypedef.tag == "recordtypedef" then
+            if regulartags["extends"] and regulartags["extends"][1] then
+              local supertype = regulartags["extends"][1].type
+              if supertype then _moduletypedef.supertype = createtyperef(supertype) end
+            end
+            if regulartags["map"] and regulartags["map"][1] then
+              local keytype = regulartags["map"][1].keytype
+              local valuetype = regulartags["map"][1].valuetype
+              if keytype and valuetype then
+                _moduletypedef.defaultkeytyperef = createtyperef(keytype)
+                _moduletypedef.defaultvaluetyperef = createtyperef(valuetype)
+                _moduletypedef.structurekind = "map"
+                _moduletypedef.structuredescription = regulartags["map"][1].description
+              end
+            elseif regulartags["list"] and regulartags["list"][1] then
+              local type = regulartags["list"][1].type
+              if type then
+                _moduletypedef.defaultvaluetyperef = createtyperef(type)
+                _moduletypedef.structurekind = "list"
+                _moduletypedef.structuredescription = regulartags["list"][1].description
+              end
+            end
+          end
         end
         -- manage "type" comment
       elseif regulartags["type"] and regulartags["type"][1].name ~= "global" then
@@ -296,7 +359,33 @@ function M.createmoduleapi(ast,modulename)
             -- define sourcerange only if we create it
             _item.sourcerange.min = sourcerangemin
             _item.sourcerange.max = sourcerangemax
-            if _item then _recordtypedef:addfield(_item) end
+            if _item and _item.name then
+              _recordtypedef:addfield(_item) end
+          end
+        end
+
+        -- manage extends (inheritance)
+        if regulartags["extends"] and regulartags["extends"][1] then
+          local supertype = regulartags["extends"][1].type
+          if supertype then _recordtypedef.supertype = createtyperef(supertype) end
+        end
+
+        -- manage structure tag
+        if regulartags["map"] and regulartags["map"][1] then
+          local keytype = regulartags["map"][1].keytype
+          local valuetype = regulartags["map"][1].valuetype
+          if keytype and valuetype then
+            _recordtypedef.defaultkeytyperef = createtyperef(keytype)
+            _recordtypedef.defaultvaluetyperef = createtyperef(valuetype)
+            _recordtypedef.structurekind = "map"
+            _recordtypedef.structuredescription = regulartags["map"][1].description
+          end
+        elseif regulartags["list"] and regulartags["list"][1] then
+          local type = regulartags["list"][1].type
+          if type then
+            _recordtypedef.defaultvaluetyperef = createtyperef(type)
+            _recordtypedef.structurekind = "list"
+            _recordtypedef.structuredescription = regulartags["list"][1].description
           end
         end
       elseif regulartags["field"] then
@@ -317,7 +406,7 @@ function M.createmoduleapi(ast,modulename)
         -- add item to its parent
         local scope = regulartags["field"][1].parent
         M.additemtoparent(_file,_item,scope,sourcerangemin,sourcerangemax)
-      elseif regulartags["function"] or regulartags["param"] or regulartags["return"] then
+      elseif regulartags["function"] or regulartags["param"] or regulartags["return"] or regulartags["callof"] then
         -- create item
         local _item = apimodel._item()
         _item.shortdescription = parsedcomment.shortdescription
@@ -325,7 +414,7 @@ function M.createmoduleapi(ast,modulename)
         _lastapiobject = _item
 
         -- set name
-        if regulartags["function"] then	_item.name =  regulartags["function"][1].name end
+        if regulartags["function"] then _item.name =  regulartags["function"][1].name end
 
         -- define sourcerange
         local sourcerangemin = comment.lineinfo.first.offset
@@ -358,6 +447,7 @@ function M.createmoduleapi(ast,modulename)
 
         -- add type name
         _functiontypedef.name = generatefunctiontypename(_functiontypedef)
+        attachmetadata(_functiontypedef, parsedcomment)
         _file:addtype(_functiontypedef)
 
         -- create ref to this type
@@ -370,6 +460,21 @@ function M.createmoduleapi(ast,modulename)
         local sourcerangemax = comment.lineinfo.last.offset
         local scope = (regulartags["function"] and regulartags["function"][1].parent) or nil
         M.additemtoparent(_file,_item,scope,sourcerangemin,sourcerangemax)
+
+        -- manage callof
+        if regulartags["callof"] and regulartags["callof"][1] and regulartags["callof"][1].type then
+          -- get the type which will be callable !
+          local _internaltyperef = createtyperef(regulartags["callof"][1].type)
+          if _internaltyperef and _internaltyperef.tag == "internaltyperef" then
+            local _typedeftypedef = gettypedef(_file,_internaltyperef.typename,"recordtypedef",sourcerangemin,sourcerangemax)
+            if _typedeftypedef then
+              -- refer the function used when the type is called
+              local _internaltyperef = apimodel._internaltyperef()
+              _internaltyperef.typename = _functiontypedef.name
+              _typedeftypedef.call =_internaltyperef
+            end
+          end
+        end
       end
     end
 
@@ -382,26 +487,7 @@ function M.createmoduleapi(ast,modulename)
       _lastapiobject.sourcerange.max = comment.lineinfo.last.offset
     end
 
-    --
-    -- Store user defined tags
-    --
-    local thirdtags = parsedcomment and parsedcomment.unknowntags
-    if thirdtags  then
-      -- Define a storage index for user defined tags on current API element
-      if not _lastapiobject.metadata then _lastapiobject.metadata = {} end
-
-      -- Loop over user defined tags
-      for usertag, taglist in pairs(thirdtags) do
-        if not _lastapiobject.metadata[ usertag ] then
-          _lastapiobject.metadata[ usertag ] = {
-            tag = usertag
-          }
-        end
-        for _, tag in ipairs( taglist ) do
-          table.insert(_lastapiobject.metadata[usertag], tag)
-        end
-      end
-    end
+    attachmetadata(_lastapiobject, parsedcomment)
 
     -- if we create an api object linked it to
     _comment2apiobj[comment] =_lastapiobject

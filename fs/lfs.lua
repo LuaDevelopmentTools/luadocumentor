@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
---  Copyright (c) 2012-2014 Sierra Wireless.
+--  Copyright (c) 2012 Sierra Wireless.
 --  All rights reserved. This program and the accompanying materials
 --  are made available under the terms of the Eclipse Public License v1.0
 --  which accompanies this distribution, and is available at
@@ -25,9 +25,9 @@ M.separator = iswindows() and [[\]] or [[/]]
 -- Will recursively browse given directories and list files encountered
 -- @param tab Table, list where files will be added
 -- @param dirorfiles list of path to browse in order to build list.
---	Files from this list will be added to <code>tab</code> list.
+--  Files from this list will be added to <code>tab</code> list.
 -- @return <code>tab</code> list, table containing all files from directories
---	and files contained in <code>dirorfile</code>
+--  and files contained in <code>dirorfile</code>
 local function appendfiles(tab, dirorfile)
 
   -- Nothing to process
@@ -88,7 +88,7 @@ end
 -- @param list Table of directories to browse
 -- @return table of string, path to files contained in given directories
 function M.filelist(list)
-  if not list	then return nil, 'No directory list provided' end
+  if not list then return nil, 'No directory list provided' end
   return appendfiles({}, list)
 end
 function M.checkdirectory( dirlist )

@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
---  Copyright (c) 2012-2014 Sierra Wireless.
+--  Copyright (c) 2012 Sierra Wireless.
 --  All rights reserved. This program and the accompanying materials
 --  are made available under the terms of the Eclipse Public License v1.0
 --  which accompanies this distribution, and is available at
@@ -78,7 +78,6 @@ function M.generateapimodule(filename, code,noheuristic)
       return nil, 'Unable to create api module for "'..filename..'".\n'..err
     end
   else
-
     -- manage shebang
     if code then code = code:gsub("^(#.-\n)", function (s) return string.rep(' ',string.len(s)) end) end
 
