@@ -21,7 +21,9 @@ M.supportedlanguages = {}
 local extractors = require 'extractors'
 
 -- Support Lua comment extracting
-M.supportedlanguages['lua'] = extractors.lua
+for _,lua in ipairs({'lua', 'doclua'}) do
+  M.supportedlanguages[lua] = extractors.lua
+end
 
 -- Support C comment extracting
 for _,c in ipairs({'c', 'cpp', 'c++'}) do
