@@ -371,13 +371,14 @@ end
 -------------------------------------------------------------------------------
 
 ---
--- Provide API Model elements from string describing global elements
--- such as:
+-- Build a global var from string such as:
 -- * `global#foo`
 -- * `foo#global.bar`
+-- @param #string str
 local globals = function(str)
   -- Handling globals from modules
-  for modulename, fieldname in str:gmatch('([%a%.%d_]+)#global%.([%a%.%d_]+)') do
+  local modulename, fieldname = str:gmatch('([%a%.%d_]+)#global%.([%a%.%d_]+)')()
+  if modulename and fieldname then
     local item = apimodel._item(fieldname)
     local file = apimodel._file()
     file.name = modulename
@@ -385,15 +386,16 @@ local globals = function(str)
     return item
   end
   -- Handling other globals
-  for name in str:gmatch('global#([%a%.%d_]+)') do
-    --  print("globale", name)
+  local name =  str:gmatch('global#([%a%.%d_]+)')()
+  if name then
     return apimodel._externaltypref('global', name)
   end
   return nil
 end
 
 ---
--- Transform a string like `module#(type).field` in an API Model item
+-- Build an external field from string like `module#(type).field`
+-- @param #string str
 local field = function( str )
 
   -- Match `module#type.field`
@@ -427,26 +429,34 @@ local field = function( str )
 end
 
 ---
--- Build an API internal reference from a string like: `#typeref`
-local internal = function ( typestring )
-  for name in typestring:gmatch('#([%a%.%d_]+)') do
-    -- Do not handle this name is it starts with reserved name "global"
-    if name:find("global.") == 1 then return nil end
-    return apimodel._internaltyperef(name)
+-- Build an API internal reference from a string like: `#typeref` or #(type.ref)
+-- @param #string str
+local internal = function ( str )
+  local typename = str:gmatch('#([%a%.%d_]+)')()
+  if not typename then
+    typename = str:gmatch('#%(([%a%.%d_]+)%)')()
+    if not typename then
+      -- No match
+      return nil
+    end
   end
-  return nil
+
+  -- Do not handle this name is it starts with reserved name "global"
+  if typename:find("global.") == 1 then return nil end
+  return apimodel._internaltyperef(typename)
 end
 
 ---
 -- Build an API external reference from a string like: `mod.ule#type`
-local extern = function (type)
+-- @param #string str
+local extern = function (str)
 
   -- Match `mod.ule#ty.pe`
-  local modulename, typename = type:gmatch('([%a%.%d_]+)#([%a%.%d_]+)')()
+  local modulename, typename = str:gmatch('([%a%.%d_]+)#([%a%.%d_]+)')()
 
   -- Trying  `mod.ule#(ty.pe)`
   if not modulename then
-    modulename, typename = type:gmatch('([%a%.%d_]+)#%(([%a%.%d_]+)%)')()
+    modulename, typename = str:gmatch('([%a%.%d_]+)#%(([%a%.%d_]+)%)')()
 
     -- No match at all
     if not modulename then
@@ -457,9 +467,11 @@ local extern = function (type)
 end
 
 ---
--- Build an API external reference from a string like: `mod.ule`
-local file = function (type)
-  for modulename in type:gmatch('([%a%.%d_]+)') do
+-- Build an API module(file) from a string like: `mod.ule`
+-- @param #string str
+local file = function (str)
+  local modulename = str:gmatch('([%a%.%d_]+)')()
+  if modulename then
     local file = apimodel._file()
     file.name = modulename
     return file
