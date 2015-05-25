@@ -85,6 +85,14 @@ local function format(string)
   return M.env.markdown( string )
 end
 ---
+-- Disable Markdown processing on a specific string
+-- @param #string s Content to browse
+-- @param #string escaped What Markdown should not process
+-- @return #string Original `s` #string with `escaped` #string backslashed
+local function escape(s, escaped)
+  return string.gsub(s, escaped, '\\'..escaped)
+end
+---
 -- Provide a full link to an element using `prettyname` and `linkto`.
 -- Default implementation is for HTML.
 local function fulllinkto(o,...)
@@ -93,7 +101,7 @@ local function fulllinkto(o,...)
   if not ref then
     return name
   end
-  return string.format('<a href="%s">%s</a>', ref, name)
+  return string.format('<a href="%s">%s</a>', ref, escape(name, '_'))
 end
 --
 -- Define default template environnement
