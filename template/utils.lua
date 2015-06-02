@@ -334,6 +334,15 @@ function M.isinvokable(item)
 end
 
 ---
+-- Disable Markdown processing on a specific string
+-- @param #string s Content to browse
+-- @param #string escaped What Markdown should not process
+-- @return #string Original `s` #string with `escaped` #string backslashed
+function M.escape(s, escaped)
+  return string.gsub(s, escaped, '\\'..escaped)
+end
+
+---
 -- Provide human readable overview from an API model element
 --
 -- Resolve all element needed to summurize nicely an element form API model.
@@ -346,7 +355,8 @@ end
 function M.prettyname( apiobject, ... )
   local tag = apiobject.tag
   if M.prettynametypes[tag] then
-    return M.prettynametypes[tag](apiobject,...)
+    local prettyname = M.prettynametypes[tag](apiobject,...)
+    return M.escape(prettyname,'_')
   elseif not tag then
     return nil, 'No pretty name available as no tag has been provided.'
   end
