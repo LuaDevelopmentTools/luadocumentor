@@ -17,6 +17,7 @@ return
 #  for _, header in ipairs(_page.headers) do
     $(header)
 #  end
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   </head>
 #end
 <body>
