@@ -53,7 +53,7 @@ return [[#
 #         end
 #       end
 #
-#       paramline = paramline .. " " .. param.name ..  " "
+#       paramline = paramline .. " " .. escape(param.name, "_") ..  " "
 #
 #       if param.optional then
 #         paramline = paramline .. "optional" .. " "

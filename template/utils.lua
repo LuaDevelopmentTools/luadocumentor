@@ -356,7 +356,7 @@ function M.prettyname( apiobject, ... )
   local tag = apiobject.tag
   if M.prettynametypes[tag] then
     local prettyname = M.prettynametypes[tag](apiobject,...)
-    return M.escape(prettyname,'_')
+    return prettyname
   elseif not tag then
     return nil, 'No pretty name available as no tag has been provided.'
   end
