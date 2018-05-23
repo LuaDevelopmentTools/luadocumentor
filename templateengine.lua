@@ -90,7 +90,7 @@ end
 -- Default implementation is for HTML.
 local function purelinkto(o,...)
   local ref   = M.env.linkto(o,...)
-  local name  = o
+  local name  = M.env.purename(o,...)
   if not ref then
     return name
   end
