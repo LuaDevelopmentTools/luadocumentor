@@ -86,7 +86,8 @@ local function format(string)
 end
 
 ---
--- Provide a full link to an element using `prettyname` and `linkto`.
+-- Provide a full link to an element using `purename` and `linkto`.
+-- The purename is not escaped.
 -- Default implementation is for HTML.
 local function purelinkto(o,...)
   local ref   = M.env.linkto(o,...)

@@ -367,7 +367,8 @@ end
 -- Provide human readable overview from an API model element
 --
 -- Resolve all element needed to summurize nicely an element form API model.
--- @usage $ print( prettyname(item) )
+-- This element is not excaped.
+-- @usage $ print( purename(item) )
 --  module:somefunction(secondparameter)
 -- @function [parent = #docutils]
 -- @param apiobject Object form API model
