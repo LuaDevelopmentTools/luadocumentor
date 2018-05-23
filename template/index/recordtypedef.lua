@@ -16,13 +16,13 @@ return [[#
   <table class="function_list">
 # if calldef then
     <tr>
-    <td class="name" nowrap="nowrap">$( fulllinkto(calldef,_recordtypedef) )</td>
+    <td class="name" nowrap="nowrap">$( purelinkto(calldef,_recordtypedef) )</td>
     <td class="summary">$( format(calldef.shortdescription) )</td>
     </tr>
 # end
 #  for _, item in sortedpairs( _recordtypedef.fields ) do
     <tr>
-    <td class="name" nowrap="nowrap">$( fulllinkto(item) )</td>
+    <td class="name" nowrap="nowrap">$( purelinkto(item) )</td>
     <td class="summary">$( format(item.shortdescription) )</td>
     </tr>
 #   end

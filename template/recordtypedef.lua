@@ -14,7 +14,7 @@ return [[#
 # -- Inheritance
 # --
 #if _recordtypedef.supertype then
-  <h$(i)> Extends $( fulllinkto(_recordtypedef.supertype)) </h$(i)>
+  <h$(i)> Extends $( purelinkto(_recordtypedef.supertype)) </h$(i)>
 #end
 # --
 # -- Descriptions
