@@ -88,6 +88,18 @@ end
 ---
 -- Provide a full link to an element using `prettyname` and `linkto`.
 -- Default implementation is for HTML.
+local function purelinkto(o,...)
+  local ref   = M.env.linkto(o,...)
+  local name  = o
+  if not ref then
+    return name
+  end
+  return string.format('<a href="%s">%s</a>', ref, name)
+end
+
+---
+-- Provide a full link to an element using `prettyname` and `linkto`.
+-- Default implementation is for HTML.
 local function fulllinkto(o,...)
   local ref   = M.env.linkto(o,...)
   local name  = M.env.prettyname(o,...)
