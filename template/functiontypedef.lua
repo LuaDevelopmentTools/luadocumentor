@@ -45,7 +45,7 @@ return [[#
 #       local paramline = "<code><em>"
 #       if param.type then
 #         local link = linkto( param.type )
-#         local name = prettyname( param.type )
+#         local name = purename( param.type )
 #         if link then
 #           paramline = paramline .. '<a href=\"' .. link .. '\">' .. name .. "</a>"
 #         else
