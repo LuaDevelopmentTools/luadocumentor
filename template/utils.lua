@@ -364,6 +364,28 @@ function M.prettyname( apiobject, ... )
 end
 
 ---
+-- Provide human readable overview from an API model element
+--
+-- Resolve all element needed to summurize nicely an element form API model.
+-- This element is not excaped.
+-- @usage $ print( purename(item) )
+--  module:somefunction(secondparameter)
+-- @function [parent = #docutils]
+-- @param apiobject Object form API model
+-- @result #string Human readable description of given element.
+-- @result #nil, #string In case of error.
+function M.purename( apiobject, ... )
+  local tag = apiobject.tag
+  if M.prettynametypes[tag] then
+    local prettyname = M.prettynametypes[tag](apiobject,...)
+    return prettyname
+  elseif not tag then
+    return nil, 'No pretty name available as no tag has been provided.'
+  end
+  return nil, string.format('No pretty name for `%s.', tag)
+end
+
+---
 -- Just make a string print table in HTML.
 -- @function [parent = #docutils] securechevrons
 -- @param #string String to convert.

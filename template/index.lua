@@ -18,7 +18,7 @@ return
 #  for _, module in sortedpairs( _index.modules ) do
 #    if module.tag ~= 'index' then
       <tr>
-      <td class="name" nowrap="nowrap">$( fulllinkto(module) )</td>
+      <td class="name" nowrap="nowrap">$( purelinkto(module) )</td>
       <td class="summary">$( module.description and format(module.shortdescription) )</td>
       </tr>
 #    end

@@ -14,7 +14,7 @@ return [[#
 # -- Inheritance
 # --
 #if _recordtypedef.supertype then
-  <h$(i)> Extends $( fulllinkto(_recordtypedef.supertype)) </h$(i)>
+  <h$(i)> Extends $( purelinkto(_recordtypedef.supertype)) </h$(i)>
 #end
 # --
 # -- Descriptions
@@ -63,7 +63,7 @@ return [[#
 <dl class="function">
 <dt>
   <a id="$(anchor(calldef,_recordtypedef))" >
-  <strong>$( prettyname(calldef,_recordtypedef) )</strong>
+  <strong>$( purename(calldef,_recordtypedef) )</strong>
   </a>
 </dt>
 <dd>   
