@@ -119,6 +119,7 @@ local defaultenv = {
   applytemplate = M.applytemplate,
   format        = format,
   linkto        = function(str) return str end,
+  purelinkto    = purelinkto,
   fulllinkto    = fulllinkto,
   prettyname    = function(s) return s end,
   getelement    = function(s) return nil end
