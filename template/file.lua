@@ -42,7 +42,7 @@ return[[#
   <table class="function_list">
 #  for _, item in sortedpairs(_file.globalvars) do
     <tr>
-    <td class="name" nowrap="nowrap">$( fulllinkto(item) )</td>
+    <td class="name" nowrap="nowrap">$( purelinkto(item) )</td>
     <td class="summary">$( format(item.shortdescription) )</td>
     </tr>
 #   end

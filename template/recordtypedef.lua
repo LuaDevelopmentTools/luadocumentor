@@ -63,7 +63,7 @@ return [[#
 <dl class="function">
 <dt>
   <a id="$(anchor(calldef,_recordtypedef))" >
-  <strong>$( prettyname(calldef,_recordtypedef) )</strong>
+  <strong>$( purename(calldef,_recordtypedef) )</strong>
   </a>
 </dt>
 <dd>   

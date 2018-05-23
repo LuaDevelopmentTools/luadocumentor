@@ -22,15 +22,15 @@ return
 # --
 #if _item.type and (not typedef or typedef.tag ~= 'functiontypedef') then
 #  --Show link only when available 
-#  local link = fulllinkto(_item.type)
+#  local link = purelinkto(_item.type)
 #  if link then
     <em>$( link )</em>
 #  else
-    <em>$(prettyname(_item.type))</em>
+    <em>$(purename(_item.type))</em>
 #  end
 #end
 <a id="$(anchor(_item))" >
-<strong>$( prettyname(_item) )</strong>
+<strong>$( purename(_item) )</strong>
 </a>
 </dt>
 <dd>
